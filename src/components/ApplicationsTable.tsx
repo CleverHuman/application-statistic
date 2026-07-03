@@ -11,6 +11,7 @@ import {
 import { format, parseISO } from "date-fns";
 import { jsPDF } from "jspdf";
 import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import type { Application } from "@/types/application";
 
 interface ApplicationsTableProps {
@@ -328,7 +329,7 @@ function ResumePreviewDialog({
   );
   const hasCoverLetter = Boolean(application.cover_letter?.trim());
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 p-4"
       onClick={onClose}
@@ -337,7 +338,7 @@ function ResumePreviewDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="resume-preview-title"
-        className="max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-2xl border border-white/50 bg-white/70 shadow-2xl shadow-purple-300/30 backdrop-blur-2xl dark:border-white/10 dark:bg-zinc-950/75 dark:shadow-none"
+        className="flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/50 bg-white/80 shadow-2xl shadow-purple-300/30 backdrop-blur-2xl dark:border-white/10 dark:bg-zinc-950/85 dark:shadow-none"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
@@ -418,7 +419,7 @@ function ResumePreviewDialog({
           </div>
         </div>
 
-        <div className="max-h-[calc(90vh-96px)] overflow-y-auto px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           <div className="mb-5 grid gap-3 rounded-xl border border-white/50 bg-white/35 p-4 text-sm backdrop-blur dark:border-white/10 dark:bg-white/5 sm:grid-cols-3">
             <PreviewMeta label="Application Title" value={application.title} />
             <PreviewMeta
@@ -442,7 +443,8 @@ function ResumePreviewDialog({
           )}
         </div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
