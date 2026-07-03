@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import type {
   ApplicationChartPeriod,
   ApplicationTrends,
@@ -24,6 +24,7 @@ const periodDescriptions: Record<ApplicationChartPeriod, string> = {
 
 export function ApplicationChart({ trends }: ApplicationChartProps) {
   const [period, setPeriod] = useState<ApplicationChartPeriod>("monthly");
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const data = trends[period];
   const max = Math.max(...data.map((item) => item.count), 1);
   const chartWidth = 640;
@@ -48,6 +49,32 @@ export function ApplicationChart({ trends }: ApplicationChartProps) {
           padding.top + plotHeight
         } L ${points[0].x} ${padding.top + plotHeight} Z`
       : "";
+  const hoveredPoint =
+    hoveredIndex !== null && points[hoveredIndex] ? points[hoveredIndex] : null;
+  const tooltipWidth = 112;
+  const tooltipHeight = 42;
+  const tooltipX = hoveredPoint
+    ? Math.min(
+        Math.max(hoveredPoint.x - tooltipWidth / 2, padding.left),
+        chartWidth - padding.right - tooltipWidth,
+      )
+    : 0;
+  const tooltipY = hoveredPoint
+    ? Math.max(hoveredPoint.y - tooltipHeight - 12, padding.top)
+    : 0;
+
+  const handleChartHover = (event: MouseEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const cursorX = ((event.clientX - rect.left) / rect.width) * chartWidth;
+    const nextIndex = points.reduce((closestIndex, point, index) => {
+      const closestDistance = Math.abs(points[closestIndex].x - cursorX);
+      const distance = Math.abs(point.x - cursorX);
+
+      return distance < closestDistance ? index : closestIndex;
+    }, 0);
+
+    setHoveredIndex(nextIndex);
+  };
 
   return (
     <div className="rounded-2xl border border-white/50 bg-white/55 p-6 shadow-lg shadow-purple-200/30 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/45 dark:shadow-none">
@@ -91,6 +118,8 @@ export function ApplicationChart({ trends }: ApplicationChartProps) {
           role="img"
           aria-label={`${periodLabels[period]} applications line chart`}
           className="h-64 w-full overflow-visible"
+          onMouseMove={handleChartHover}
+          onMouseLeave={() => setHoveredIndex(null)}
         >
           <defs>
             <linearGradient id="application-chart-area" x1="0" x2="0" y1="0" y2="1">
@@ -139,12 +168,52 @@ export function ApplicationChart({ trends }: ApplicationChartProps) {
             />
           ) : null}
 
-          {points.map((point) => (
+          {hoveredPoint ? (
+            <g pointerEvents="none">
+              <line
+                x1={hoveredPoint.x}
+                x2={hoveredPoint.x}
+                y1={padding.top}
+                y2={padding.top + plotHeight}
+                className="stroke-blue-500/45"
+                strokeDasharray="4 4"
+              />
+              <rect
+                x={tooltipX}
+                y={tooltipY}
+                width={tooltipWidth}
+                height={tooltipHeight}
+                rx="10"
+                className="fill-white/95 stroke-blue-200 drop-shadow-sm dark:fill-zinc-950/95 dark:stroke-blue-500/30"
+              />
+              <text
+                x={tooltipX + tooltipWidth / 2}
+                y={tooltipY + 17}
+                textAnchor="middle"
+                className="fill-zinc-500 text-[11px] dark:fill-zinc-400"
+              >
+                {hoveredPoint.label}
+              </text>
+              <text
+                x={tooltipX + tooltipWidth / 2}
+                y={tooltipY + 33}
+                textAnchor="middle"
+                className="fill-zinc-900 text-[13px] font-semibold dark:fill-zinc-50"
+              >
+                {hoveredPoint.count} applications
+              </text>
+            </g>
+          ) : null}
+
+          {points.map((point, index) => {
+            const isHovered = hoveredIndex === index;
+
+            return (
             <g key={point.label}>
               <circle
                 cx={point.x}
                 cy={point.y}
-                r="4"
+                r={isHovered ? "6" : "4"}
                 className="fill-white/90 stroke-blue-600 dark:fill-zinc-950/90"
                 strokeWidth="3"
               >
@@ -161,7 +230,8 @@ export function ApplicationChart({ trends }: ApplicationChartProps) {
                 {point.shortLabel}
               </text>
             </g>
-          ))}
+            );
+          })}
         </svg>
       </div>
     </div>
