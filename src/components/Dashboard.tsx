@@ -20,6 +20,11 @@ const tabs: { id: ResumeTable; label: string; description: string }[] = [
     label: "Resume V1",
     description: "Applications from the resumev1 table",
   },
+  {
+    id: "euresumev0",
+    label: "EU Resume V0",
+    description: "Applications from the euresumev0 table",
+  },
 ];
 
 async function getStats(table: ResumeTable) {
