@@ -6,7 +6,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export type ResumeTable = "resume" | "resumev1" | "euresumev0";
+export type ResumeTable = "resume" | "resumev1" | "euresumev0" | "caleb";
 
 export async function fetchApplications(
   table: ResumeTable,
