@@ -9,6 +9,16 @@ export interface Application {
   cover_letter: string | null;
 }
 
+export interface Job {
+  id: number;
+  created_at: string;
+  name: string;
+  title: string;
+  company: string;
+  job_link: string;
+  status: string;
+}
+
 export type ApplicationChartPeriod = "daily" | "monthly" | "yearly";
 
 export interface ApplicationChartPoint {
