@@ -10,13 +10,20 @@ export interface Application {
 }
 
 export interface Job {
-  id: number;
-  created_at: string;
-  name: string;
+  url: string;
+  jobId: string;
   title: string;
   company: string;
-  job_link: string;
-  status: string;
+  location: string;
+  workMode: string;
+  jobType: string;
+  salary: string;
+  postedAt: string;
+  postedAtUtc: string;
+  description: string;
+  requirements: string;
+  skills: string;
+  scrapedAt: string;
 }
 
 export type ApplicationChartPeriod = "daily" | "monthly" | "yearly";
